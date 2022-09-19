@@ -48,16 +48,10 @@ def extrair_inteiro(texto):
 		return 0
 
 driver = webdriver.Chrome()
-driver.get('https://ourworldindata.org/energy-mix#energy-mix-what-sources-do-we-get-our-energy-from')
+driver.get('https://www.drogasil.com.br/dipirona-sodica-ems-gen-500mg-1x10-comprimidos.html')
 
-botao_cookie = WebDriverWait(driver, 20).until(
-	EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-track-note="cookie-notice"]'))
-)
 
 # Às vezes o botão não era clicável de verdade logo de primeira 😅 ...
-time.sleep(2)
-
-botao_cookie.click()
 
 botoes_tabela = WebDriverWait(driver, 20).until(
 	EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'a[data-track-note="chart-click-table"]'))
