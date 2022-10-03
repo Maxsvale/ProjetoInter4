@@ -1,6 +1,8 @@
-
+from dataclasses import replace
+from os import rename
 import sys
 import time
+from unicodedata import decimal
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -38,6 +40,8 @@ def coletar_paguemenos():
 		paguemenos.append(coleta)
 	print(paguemenos)
 
+	return paguemenos
+
 #FUNÇÕES DROGA RAIA
 
 def coletar_preco_drogaraia(hotlink = ''):
@@ -67,6 +71,8 @@ def coletar_drogaraia():
 		drogaraia.append(coleta)
 	print(drogaraia)
 
+	return drogaraia
+
 #FUNÇÕES DROGARIA SÃO PAULO
 
 def coletar_preco_drogariasp(hotlink = ''):
@@ -94,11 +100,22 @@ def coletar_drogariasp():
 	for i in links_drogariasp:
 		coleta = coletar_preco_drogariasp(i)
 		drogariasp.append(coleta)
+	return drogariasp
+
+#FUNÇÕES FORMATAÇÃO
+
+def limpar_preco(preco):
+	preco = preco.replace('R$ ','')
+	preco = preco.replace(',','.')
+	return float(preco)
+
+if __name__ == '__main__':
+	#Paguemenos = coletar_paguemenos()
+	#drogaraia = coletar_drogaraia()
+	drogariasp = coletar_drogariasp()
 
 
-coletar_paguemenos()
-coletar_drogaraia()
-coletar_drogariasp()
+	print( list(map(lambda p: limpar_preco(p[1]), drogariasp )) )	
 
 
 driver.close()
