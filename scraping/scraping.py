@@ -1,3 +1,4 @@
+from ast import Try
 from dataclasses import replace
 from os import rename
 import sys
@@ -9,33 +10,47 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
 driver = webdriver.Chrome()
 
+def limparPreco(preco):
+	if preco == None or preco == '':
+		return -1
+	try:
+		preco = float(preco)
+	except:
+		preco = -1
+	return preco
+
 # FUNCÕES PAGUE MENOS
-def coletar_preco_paguemenos(hotlink = ''):
-	driver.get(hotlink)
-	produto = []
-	preco = WebDriverWait(driver, 10).until(
+def coletar_preco_paguemenos(medicamento):
+	driver.get(medicamento.link)
+	try:
+		preco = WebDriverWait(driver, 10).until(
 		EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div/div[1]/div/div/div/div[4]/div/div/div/section/div/div/div/div[1]/div[2]/div/div[3]/div/div[5]/div/div[1]/div[1]/div/div[2]/div/div[2]/span/span'))
-	)
-	nome = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div/div[1]/div/div/div/div[4]/div/div/div/section/div/div/div/div[1]/div[2]/div/div[3]/div/div[3]/h1/span'))
-	)
-	print(nome.text)
-	print(preco.text)
-	produto.append(nome.text)
-	produto.append(preco.text)
-	print(produto)
-	return produto
+		)
+		preco = preco.text
+	except:
+		try:
+			preco = WebDriverWait(driver, 10).until(
+			EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div/div[1]/div/div/div/div[4]/div/div/div/section/div/div/div/div[1]/div[2]/div/div[3]/div/div[5]/div/div/div[1]/div/div[2]/div/div/span/span'))
+			)
+			preco = preco.text
+		except:
+			preco = '-1'
+	medicamento.preco = limparPreco(preco)
 
 def coletar_paguemenos():
-	links_paguemenos = [
-		'https://www.paguemenos.com.br/dipirona-500mg-envelope-com-10-comprimidos-generico-ems/p', #dipirona
+	medicamentos_paguemenos = [
+		{
+			'idfarmacia': 1,
+			'idmedicamento': 1,
+			'link': 'https://www.paguemenos.com.br/dipirona-500mg-envelope-com-10-comprimidos-generico-ems/p',
+			'preco': -1
+		}, #dipirona
 		'https://www.paguemenos.com.br/advil-400mg-leve-8-pague-6-capsulas/p', #advil
 		'https://www.paguemenos.com.br/engov-com-12-comprimidos/p', #engov
 		'https://www.paguemenos.com.br/neosaldina-com-10-drageas/p', #neosaldina
-		'https://www.paguemenos.com.br/dorflex-36-comprimidos/p' #dorflex
+		'https://www.paguemenos.com.br/dorflex-36-comprimidos/p', #dorflex
 		'https://www.paguemenos.com.br/novalgina-1g-10-comprimidos/p', #novalgina
 		'https://www.paguemenos.com.br/sal-de-fruta-eno-efervescente-2-saches-de-5g/p', #eno
 		'https://www.paguemenos.com.br/neosoro-solucao-nasal-adulto-com-30-ml/p', #neosoro
@@ -48,22 +63,22 @@ def coletar_paguemenos():
 		'https://www.paguemenos.com.br/espironolactona-25mg-com-30-comprimidos-generico-geolab/p', #espironolactona
 		'https://www.paguemenos.com.br/insulina-novolin-r-10ml/p' #insulina
 	]
-	paguemenos = []
-	for i in links_paguemenos:
-		coleta = coletar_preco_paguemenos(i)
-		paguemenos.append(coleta)
-	print(paguemenos)
-
-	return paguemenos
+	for medicamento in medicamentos_paguemenos:
+		coletar_preco_paguemenos(medicamento)
+	return medicamentos_paguemenos
 
 #FUNÇÕES DROGA RAIA
 
 def coletar_preco_drogaraia(hotlink = ''):
 	driver.get(hotlink)
 	produto = []
-	preco = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/main/div[3]/div/div[2]/div/div[1]/div[1]/span[2]'))
-	)
+	try:
+		preco = WebDriverWait(driver, 10).until( 
+			EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/main/div[3]/div/div[2]/div/div[1]/div[1]/span[2]'))
+		)
+	except:
+		preco = -1
+
 	nome = WebDriverWait(driver, 10).until(
 		EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/main/div[3]/div/div[2]/div/div[2]/div/h1'))
 	)
@@ -106,9 +121,16 @@ def coletar_drogaraia():
 def coletar_preco_drogariasp(hotlink = ''):
 	driver.get(hotlink)
 	produto = []
-	preco = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located((By.XPATH, '//*[@id="inicio-conteudo"]/div[1]/div/div/div[4]/div/div[1]/div[3]/div/p[1]/em[2]/strong'))
-	)
+	try:
+		preco = WebDriverWait(driver, 10).until(
+			EC.presence_of_element_located((By.XPATH, '//*[@id="inicio-conteudo"]/div[1]/div/div/div[4]/div/div[1]/div[3]/div/p[1]/em[2]/strong'))
+		)
+	except:
+		preco = WebDriverWait(driver, 10).until(
+			EC.presence_of_element_located((By.XPATH, '//*[@id="inicio-conteudo"]/div[1]/div/div/div[4]/div/div[1]/div[3]/div/p[1]/em[1]/strong'))
+		)
+		
+
 	nome = WebDriverWait(driver, 10).until(
 		EC.presence_of_element_located((By.XPATH, '//*[@id="inicio-conteudo"]/div[1]/div/div/div[2]/h1/div'))
 	)
