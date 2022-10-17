@@ -64,7 +64,7 @@ def coletar_paguemenos():
 		'https://www.paguemenos.com.br/insulina-novolin-r-10ml/p' #insulina
 	]
 	for medicamento in medicamentos_paguemenos:
-		coletar_preco_paguemenos(medicamento)
+		coletar_preco_paguemenos(medicamento)	
 	return medicamentos_paguemenos
 
 #FUNÇÕES DROGA RAIA
